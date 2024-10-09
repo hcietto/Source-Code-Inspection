@@ -62,15 +62,6 @@ class Troco {
             this.troco = troco;
         }
 
-        @Override
-        public boolean hasNext() {
-            for (int i = 5; i >= 0; i--) {
-                if (troco.papeisMoeda[i] != null) {
-                    return true;
-                }
-            }
-            return false;
-        }
 
         @Override
         public PapelMoeda next() {
