@@ -2,34 +2,32 @@ package br.calebe.ticketmachine.core;
 
 import br.calebe.ticketmachine.exception.PapelMoedaInvalidaException;
 import br.calebe.ticketmachine.exception.SaldoInsuficienteException;
-import java.util.Iterator;
 
-/**
- *
- * @author Calebe de Paula Bianchini
- */
 public class TicketMachine {
 
-    protected int valor;
-    protected int saldo;
-    protected int[] papelMoeda = {2, 5, 10, 20, 50, 100};
+    private int valorDoBilhete;
+    private int saldo;
+    private final int[] papeisMoedaValidos = {2, 5, 10, 20, 50, 100};
 
-    public TicketMachine(int valor) {
-        this.valor = valor;
+    public TicketMachine(int valorDoBilhete) {
+        this.valorDoBilhete = valorDoBilhete;
         this.saldo = 0;
     }
 
     public void inserir(int quantia) throws PapelMoedaInvalidaException {
-        boolean achou = false;
-        for (int i = 0; i < papelMoeda.length && !achou; i++) {
-            if (papelMoeda[i] == quantia) {
-                achou = true;
-            }
-        }
-        if (!achou) {
+        if (!isQuantiaValida(quantia)) {
             throw new PapelMoedaInvalidaException();
         }
         this.saldo += quantia;
+    }
+
+    private boolean isQuantiaValida(int quantia) {
+        for (int valor : papeisMoedaValidos) {
+            if (valor == quantia) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getSaldo() {
@@ -37,12 +35,20 @@ public class TicketMachine {
     }
 
     public String imprimir() throws SaldoInsuficienteException {
-        if (saldo < valor) {
+        if (saldo < valorDoBilhete) {
             throw new SaldoInsuficienteException();
         }
-        String result = "*****************\n";
-        result += "*** R$ " + valor + ",00 ****\n";
-        result += "*****************\n";
-        return result;
+        saldo -= valorDoBilhete;  // Desconta o valor do saldo
+        return gerarTicket();
+    }
+
+    private String gerarTicket() {
+        return "*****************\n" +
+               "*** R$ " + valorDoBilhete + ",00 ****\n" +
+               "*****************\n";
+    }
+
+    public Troco calcularTroco() {
+        return new CalculadoraDeTroco().calcularTroco(saldo);
     }
 }
